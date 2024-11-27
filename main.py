@@ -2,10 +2,38 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi import Depends
 from fastapi import status
+from fastapi.middleware.cors import CORSMiddleware
+from  fastapi import Request
+from fastapi.responses import JSONResponse
 
 
 # create the FastApi Application
 app=FastAPI()
+
+
+#error  for 404
+@app.exception_handler(404)
+async def custom_404_error(request:Request,exc:Exception):
+    return JSONResponse(
+        status_code=404,
+        content={'message':"The resource was not found"}
+    )
+
+
+# allowed origin
+origins=[
+    "http://localhost:8000",
+]
+
+# add cors middleware  to fast api
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+
+)
 
 # pydantic model for items
 class Item(BaseModel):
